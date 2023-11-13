@@ -34,6 +34,9 @@ def send_bdpu_every_sec():
         # TODO Send BDPU every second if necessary
         time.sleep(1)
 
+def isUnicast(mac):
+    return mac[0] & 0x01 == 0
+
 def main():
     # init returns the max interface number. Our interfaces
     # are 0, 1, 2, ..., init_ret value + 1
@@ -53,6 +56,8 @@ def main():
     for i in interfaces:
         print(get_interface_name(i))
 
+    Table = {}
+
     while True:
         # Note that data is of type bytes([...]).
         # b1 = bytes([72, 101, 108, 108, 111])  # "Hello"
@@ -63,8 +68,8 @@ def main():
         dest_mac, src_mac, ethertype, vlan_id = parse_ethernet_header(data)
 
         # Print the MAC src and MAC dst in human readable format
-        dest_mac = ':'.join(f'{b:02x}' for b in dest_mac)
-        src_mac = ':'.join(f'{b:02x}' for b in src_mac)
+        # dest_mac = ':'.join(f'{b:02x}' for b in dest_mac)
+        # src_mac = ':'.join(f'{b:02x}' for b in src_mac)
 
         # Note. Adding a VLAN tag can be as easy as
         # tagged_frame = data[0:12] + create_vlan_tag(10) + data[12:]
@@ -76,6 +81,21 @@ def main():
         print("Received frame of size {} on interface {}".format(length, interface), flush=True)
 
         # TODO: Implement forwarding with learning
+        Table[src_mac] = interface
+        if isUnicast(dest_mac):
+            if dest_mac in Table:
+                send_to_link(Table[dest_mac], data, length)
+            else:
+                for curr_interface in interfaces:
+                    if curr_interface != interface:
+                        send_to_link(Table[dest_mac], data, length)
+
+        else:
+            # trimite cadrul pe toate celelalte porturi
+            for curr_interface in interfaces:
+                if curr_interface != interface:
+                    send_to_link(Table[dest_mac], data, length)
+
         # TODO: Implement VLAN support
         # TODO: Implement STP support
 

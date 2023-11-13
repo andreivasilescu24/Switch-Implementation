@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "switch.py", line 106, in <module>
+    main()
+  File "switch.py", line 91, in main
+    send_to_link(Table[dest_mac], data, length)
+KeyError: b'\xde\xad\xbe\xef\x00\x02'
