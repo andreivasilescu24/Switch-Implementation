@@ -88,13 +88,13 @@ def main():
             else:
                 for curr_interface in interfaces:
                     if curr_interface != interface:
-                        send_to_link(Table[dest_mac], data, length)
+                        send_to_link(curr_interface, data, length)
 
         else:
             # trimite cadrul pe toate celelalte porturi
             for curr_interface in interfaces:
                 if curr_interface != interface:
-                    send_to_link(Table[dest_mac], data, length)
+                    send_to_link(curr_interface, data, length)
 
         # TODO: Implement VLAN support
         # TODO: Implement STP support

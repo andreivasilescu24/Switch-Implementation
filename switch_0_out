@@ -9,7 +9,91 @@ Destination MAC: b'\xde\xad\xbe\xef\x00\x02'
 Source MAC: b'\xde\xad\xbe\xef\x00\x00'
 EtherType: 2048
 Received frame of size 42 on interface 0
-Setting up interface: r-0
-Setting up interface: r-1
-Setting up interface: rr-0-1
-Setting up interface: rr-0-2
+Destination MAC: b'\xff\xff\xff\xff\xff\xff'
+Source MAC: b'\xde\xad\xbe\xef\x00\x02'
+EtherType: 2054
+Received frame of size 42 on interface 2
+Destination MAC: b'\xde\xad\xbe\xef\x00\x02'
+Source MAC: b'\xde\xad\xbe\xef\x00\x00'
+EtherType: 2054
+Received frame of size 42 on interface 0
+Destination MAC: b'\xde\xad\xbe\xef\x00\x00'
+Source MAC: b'\xde\xad\xbe\xef\x00\x02'
+EtherType: 2048
+Received frame of size 42 on interface 2
+Destination MAC: b'\xde\xad\xbe\xef\x00\x03'
+Source MAC: b'\xde\xad\xbe\xef\x00\x00'
+EtherType: 2048
+Received frame of size 42 on interface 0
+Destination MAC: b'\xff\xff\xff\xff\xff\xff'
+Source MAC: b'\xde\xad\xbe\xef\x00\x03'
+EtherType: 2054
+Received frame of size 42 on interface 2
+Destination MAC: b'\xde\xad\xbe\xef\x00\x03'
+Source MAC: b'\xde\xad\xbe\xef\x00\x00'
+EtherType: 2054
+Received frame of size 42 on interface 0
+Destination MAC: b'\xde\xad\xbe\xef\x00\x00'
+Source MAC: b'\xde\xad\xbe\xef\x00\x03'
+EtherType: 2048
+Received frame of size 42 on interface 2
+Destination MAC: b'\xde\xad\xbe\xef\x00\x02'
+Source MAC: b'\xde\xad\xbe\xef\x00\x00'
+EtherType: 2048
+Received frame of size 42 on interface 0
+Destination MAC: b'\xde\xad\xbe\xef\x00\x00'
+Source MAC: b'\xde\xad\xbe\xef\x00\x02'
+EtherType: 2048
+Received frame of size 42 on interface 2
+Destination MAC: b'\xde\xad\xbe\xef\x00\x03'
+Source MAC: b'\xde\xad\xbe\xef\x00\x00'
+EtherType: 2048
+Received frame of size 42 on interface 0
+Destination MAC: b'\xde\xad\xbe\xef\x00\x00'
+Source MAC: b'\xde\xad\xbe\xef\x00\x03'
+EtherType: 2048
+Received frame of size 42 on interface 2
+Destination MAC: b'\xde\xad\xbe\xef\x00\x00'
+Source MAC: b'\xde\xad\xbe\xef\x00\x03'
+EtherType: 2054
+Received frame of size 42 on interface 2
+Destination MAC: b'\xde\xad\xbe\xef\x00\x03'
+Source MAC: b'\xde\xad\xbe\xef\x00\x00'
+EtherType: 2054
+Received frame of size 42 on interface 0
+Destination MAC: b'\xde\xad\xbe\xef\x00\x01'
+Source MAC: b'\xde\xad\xbe\xef\x00\x00'
+EtherType: 2048
+Received frame of size 42 on interface 0
+Destination MAC: b'\xff\xff\xff\xff\xff\xff'
+Source MAC: b'\xde\xad\xbe\xef\x00\x01'
+EtherType: 2054
+Received frame of size 42 on interface 1
+Destination MAC: b'\xde\xad\xbe\xef\x00\x01'
+Source MAC: b'\xde\xad\xbe\xef\x00\x00'
+EtherType: 2054
+Received frame of size 42 on interface 0
+Destination MAC: b'\xde\xad\xbe\xef\x00\x00'
+Source MAC: b'\xde\xad\xbe\xef\x00\x01'
+EtherType: 2048
+Received frame of size 42 on interface 1
+Destination MAC: b'\xde\xad\xbe\xef\x00\x01'
+Source MAC: b'\xde\xad\xbe\xef\x00\x03'
+EtherType: 2048
+Received frame of size 42 on interface 2
+Destination MAC: b'\xff\xff\xff\xff\xff\xff'
+Source MAC: b'\xde\xad\xbe\xef\x00\x01'
+EtherType: 2054
+Received frame of size 42 on interface 1
+Destination MAC: b'\xde\xad\xbe\xef\x00\x01'
+Source MAC: b'\xde\xad\xbe\xef\x00\x03'
+EtherType: 2054
+Received frame of size 42 on interface 2
+Destination MAC: b'\xde\xad\xbe\xef\x00\x03'
+Source MAC: b'\xde\xad\xbe\xef\x00\x01'
+EtherType: 2048
+Received frame of size 42 on interface 1
+Destination MAC: b'\xff\xff\xff\xff\xff\xff'
+Source MAC: b'\xde\xad\xbe\xef\x00\x02'
+EtherType: 2054
+Received frame of size 42 on interface 2
