@@ -35,7 +35,7 @@ def send_bdpu_every_sec():
         time.sleep(1)
 
 def isUnicast(mac):
-    return mac[0] & 0x01 == 0
+    return mac[0] & 0x80
 
 def main():
     # init returns the max interface number. Our interfaces
