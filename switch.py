@@ -37,10 +37,30 @@ def send_bdpu_every_sec():
 def isUnicast(mac):
     return mac[0] & 0x80
 
+def is_vlan_tag_necessary(switch_interfaces, interface_received, interface_send, vlan_id):
+    # if switch_interfaces[interface_received] == 'T':
+        
+
+
 def main():
     # init returns the max interface number. Our interfaces
     # are 0, 1, 2, ..., init_ret value + 1
     switch_id = sys.argv[1]
+    port_types = {}
+
+    config_file_path = "configs/switch" + switch_id + ".cfg"
+    config_file = open(config_file_path, "r")
+
+    priority = int(config_file.readline())
+    port_details = config_file.readlines()
+
+    port_index = 0
+    for config_file_line in port_details:
+        config_file_line = config_file_line.strip().split(" ")
+        port_types[port_index] = config_file_line[1]
+        port_index += 1
+
+    print(port_types)
 
     num_interfaces = wrapper.init(sys.argv[2:])
     interfaces = range(0, num_interfaces)
@@ -84,12 +104,14 @@ def main():
         Table[src_mac] = interface
         if isUnicast(dest_mac):
             if dest_mac in Table:
+                
+
+
                 send_to_link(Table[dest_mac], data, length)
             else:
                 for curr_interface in interfaces:
                     if curr_interface != interface:
                         send_to_link(curr_interface, data, length)
-
         else:
             # trimite cadrul pe toate celelalte porturi
             for curr_interface in interfaces:
@@ -97,10 +119,10 @@ def main():
                     send_to_link(curr_interface, data, length)
 
         # TODO: Implement VLAN support
+
+
         # TODO: Implement STP support
 
-        # data is of type bytes.
-        # send_to_link(i, data, length)
 
 if __name__ == "__main__":
     main()
