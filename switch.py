@@ -37,16 +37,52 @@ def send_bdpu_every_sec():
 def isUnicast(mac):
     return mac[0] & 0x80
 
-def is_vlan_tag_necessary(switch_interfaces, interface_received, interface_send, vlan_id):
-    # if switch_interfaces[interface_received] == 'T':
+# def is_vlan_tag_needed_trunk(switch_interfaces, interface_send, vlan_id):
+#     if switch_interfaces[interface_send] == -1:
+#         return True
+#     elif switch_interfaces[interface_send] != -1 and vlan_id == switch_interfaces[interface_send]:
+#         return False
+    
         
+def is_vlan_tag_needed(switch_interfaces, interface_send, vlan_id):
+    if switch_interfaces[interface_send] == -1:
+        return True
+    elif switch_interfaces[interface_send] != -1 and vlan_id == switch_interfaces[interface_send]:
+        return False
+    
 
+def send_vlan_packets(switch_interfaces, interface_received, interface_send, data, length, vlan_id):
+    print(interface_received)
+    print(interface_send)
+    if switch_interfaces[interface_received] == -1:
+        if is_vlan_tag_needed(switch_interfaces, interface_send, vlan_id):
+            send_to_link(interface_send, data, length)
+        else:
+            print("********** TRUNK TO ACCESS **********")
+            send_to_link(interface_send, data[0:12] + data[16:], length - 4)
+
+    else:
+        if is_vlan_tag_needed(switch_interfaces, interface_send, switch_interfaces[interface_received]):
+            send_to_link(interface_send, data[0:12] + create_vlan_tag(switch_interfaces[interface_received]) + data[12:], length + 4)
+        else:
+            send_to_link(interface_send, data, length)
+
+
+def is_vlan_compatible(interface_received, interface_send, switch_interfaces, vlan_id):
+    if switch_interfaces[interface_received] == -1 and (switch_interfaces[interface_send] == -1 or switch_interfaces[interface_send] == vlan_id):
+        return True
+    elif switch_interfaces[interface_send] == -1:
+        return True
+    elif switch_interfaces[interface_received] == switch_interfaces[interface_send]:
+        return True
+    else:
+        return False
 
 def main():
     # init returns the max interface number. Our interfaces
     # are 0, 1, 2, ..., init_ret value + 1
     switch_id = sys.argv[1]
-    port_types = {}
+    switch_interfaces = {}
 
     config_file_path = "configs/switch" + switch_id + ".cfg"
     config_file = open(config_file_path, "r")
@@ -57,10 +93,13 @@ def main():
     port_index = 0
     for config_file_line in port_details:
         config_file_line = config_file_line.strip().split(" ")
-        port_types[port_index] = config_file_line[1]
+        if config_file_line[1] == "T":
+            switch_interfaces[port_index] = -1 
+        else: 
+            switch_interfaces[port_index] = int(config_file_line[1])
         port_index += 1
 
-    print(port_types)
+    print(switch_interfaces)
 
     num_interfaces = wrapper.init(sys.argv[2:])
     interfaces = range(0, num_interfaces)
@@ -94,6 +133,9 @@ def main():
         # Note. Adding a VLAN tag can be as easy as
         # tagged_frame = data[0:12] + create_vlan_tag(10) + data[12:]
 
+        
+        print("VLAN ID {vlan_id}".format(vlan_id=vlan_id))
+
         print(f'Destination MAC: {dest_mac}')
         print(f'Source MAC: {src_mac}')
         print(f'EtherType: {ethertype}')
@@ -104,19 +146,19 @@ def main():
         Table[src_mac] = interface
         if isUnicast(dest_mac):
             if dest_mac in Table:
-                
-
-
-                send_to_link(Table[dest_mac], data, length)
+                if is_vlan_compatible(interface, Table[dest_mac], switch_interfaces, vlan_id):
+                    send_vlan_packets(switch_interfaces, interface, Table[dest_mac], data, length, vlan_id)
             else:
                 for curr_interface in interfaces:
                     if curr_interface != interface:
-                        send_to_link(curr_interface, data, length)
+                        if is_vlan_compatible(interface, curr_interface, switch_interfaces, vlan_id):
+                            send_vlan_packets(switch_interfaces, interface, curr_interface, data, length, vlan_id)
         else:
             # trimite cadrul pe toate celelalte porturi
             for curr_interface in interfaces:
                 if curr_interface != interface:
-                    send_to_link(curr_interface, data, length)
+                    if is_vlan_compatible(interface, curr_interface, switch_interfaces, vlan_id):
+                        send_vlan_packets(switch_interfaces, interface, curr_interface, data, length, vlan_id)
 
         # TODO: Implement VLAN support
 
