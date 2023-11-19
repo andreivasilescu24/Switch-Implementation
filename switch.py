@@ -7,7 +7,6 @@ import time
 from wrapper import recv_from_any_link, send_to_link, get_switch_mac, get_interface_name
 
 root_bridge_id = -1
-# switch_interfaces = {}
 
 def parse_ethernet_header(data):
     # Unpack the header fields from the byte array
@@ -37,25 +36,23 @@ def create_bpdu_packet(root_bridge_id, root_path_cost, bridge_id, mac_bpdu, swit
     logical_link_control_part = struct.pack('!BBB', 0x42, 0x42, 0x03)
     bpdu_header = struct.pack('!HBB', 0x0000, 0x00, 0x00)
     bpdu_payload = struct.pack('!HIH', root_bridge_id, root_path_cost, bridge_id)
+    
     bpdu = ethernet_part + logical_link_control_part + bpdu_header + bpdu_payload
+
     return bpdu
 
 def send_bdpu_every_sec(switch_interfaces, bridge_id, mac_bpdu, switch_mac):
     while True:
         # TODO Send BDPU every second if necessary
         if bridge_id == root_bridge_id:
-            print("Sending BPDU")
-            print(root_bridge_id)
-            if bridge_id == root_bridge_id:
-                for port, port_type in switch_interfaces.items():
-                    if port_type == -1:
-                        bpdu_packet = create_bpdu_packet(root_bridge_id, 0, bridge_id, mac_bpdu, switch_mac)
-                        send_to_link(port, bpdu_packet, len(bpdu_packet))
-            time.sleep(1)
+            for port, port_type in switch_interfaces.items():
+                if port_type == -1:
+                    bpdu_packet = create_bpdu_packet(root_bridge_id, 0, bridge_id, mac_bpdu, switch_mac)
+                    send_to_link(port, bpdu_packet, len(bpdu_packet))
+        time.sleep(1)
 
 def isUnicast(mac):
-    return mac[0] & 0x80
-
+    return (mac[0] & 0x01) == 0
         
 def is_vlan_tag_needed(switch_interfaces, interface_send, vlan_id):
     if switch_interfaces[interface_send] == -1:
@@ -65,8 +62,6 @@ def is_vlan_tag_needed(switch_interfaces, interface_send, vlan_id):
     
 
 def send_vlan_packets(switch_interfaces, interface_received, interface_send, data, length, vlan_id):
-    print(interface_received)
-    print(interface_send)
     if switch_interfaces[interface_received] == -1:
         if is_vlan_tag_needed(switch_interfaces, interface_send, vlan_id):
             send_to_link(interface_send, data, length)
@@ -127,7 +122,6 @@ def main():
     print("# Starting switch with id {}".format(switch_id), flush=True)
     print("[INFO] Switch MAC", ':'.join(f'{b:02x}' for b in get_switch_mac()))
 
-
     if bridge_id == root_bridge_id:
         for port, port_type in switch_interfaces.items():
             if port_type == -1:
@@ -145,34 +139,21 @@ def main():
     root_port = -1
     
     while True:
-        # Note that data is of type bytes([...]).
-        # b1 = bytes([72, 101, 108, 108, 111])  # "Hello"
-        # b2 = bytes([32, 87, 111, 114, 108, 100])  # " World"
-        # b3 = b1[0:2] + b[3:4].
         interface, data, length = recv_from_any_link()
 
         dest_mac, src_mac, ethertype, vlan_id = parse_ethernet_header(data)
 
         if dest_mac == mac_bpdu:
-            print("BPDU received")
-            print(port_states)
-            print("PORT STATES BPDU")
-
             bdpu_payload = struct.unpack('!HIH', data[21:29])
             root_bridge_id_bpdu = bdpu_payload[0]
             root_path_cost_bpdu = bdpu_payload[1]
             bridge_id_bpdu = bdpu_payload[2]
-
-            print(f'ROOT PATH COST {root_path_cost}')
-            print(f'ROOT PORT {root_port}')
 
             if root_bridge_id_bpdu < root_bridge_id:
                 ex_root_bridge_id = root_bridge_id
                 root_bridge_id = root_bridge_id_bpdu
                 root_path_cost = root_path_cost_bpdu + 10
                 root_port = interface
-
-                print(f'NEW ROOT BRIDGE ID {root_bridge_id}')
 
                 if ex_root_bridge_id == bridge_id:
                     for port, port_type in switch_interfaces.items():
@@ -197,21 +178,12 @@ def main():
 
             elif bridge_id_bpdu == bridge_id:
                 port_states[interface] = "BLOCKING"
-            # else:
-            #     continue
+            else:
+                continue
             
             if bridge_id == root_bridge_id:
                 for port, port_type in port_states.items():
                     port_states[port] = "LISTENING"
-
-            continue
-
-        # Print the MAC src and MAC dst in human readable forsmat
-        # dest_mac = ':'.join(f'{b:02x}' for b in dest_mac)
-        # src_mac = ':'.join(f'{b:02x}' for b in src_mac)
-
-        # Note. Adding a VLAN tag can be as easy as
-        # tagged_frame = data[0:12] + create_vlan_tag(10) + data[12:]
         
         elif port_states[interface] == "LISTENING":
 
@@ -233,17 +205,10 @@ def main():
                             if port_states[curr_interface] == 'LISTENING' and is_vlan_compatible(interface, curr_interface, switch_interfaces, vlan_id):
                                 send_vlan_packets(switch_interfaces, interface, curr_interface, data, length, vlan_id)
             else:
-                # trimite cadrul pe toate celelalte porturi
                 for curr_interface in interfaces:
                     if curr_interface != interface:
                         if port_states[curr_interface] == 'LISTENING' and is_vlan_compatible(interface, curr_interface, switch_interfaces, vlan_id):
                             send_vlan_packets(switch_interfaces, interface, curr_interface, data, length, vlan_id)
-
-            # TODO: Implement VLAN support
-
-
-            # TODO: Implement STP support
-
 
 if __name__ == "__main__":
     main()
